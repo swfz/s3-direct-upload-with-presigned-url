@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+  </head>
+  <script type="text/javascript">
+
+  function upload() {
+    const extension = document.querySelector("#image").value.split(".").slice(-1)[0];
+    console.log(extension);
+    fetch(`/presigned_post_url?extension=${extension}`)
+      .then(res => res.json())
+      .then(json => {
+        console.log(json)
+        const file = document.querySelector("#image").files[0];
+        const formData = new FormData();
+
+        for (const key in json.fields) {
+          formData.append(key, json.fields[key])
+        }
+        formData.append('file', file);
+
+        const headers = {
+          'accept': 'multipart/form-data'
+        };
+        fetch(json.url,{method: 'POST', headers, body: formData}).then((res) => {
+          console.log('fetch');
+          console.log(res);
+        });
+      });
+  }
+  </script>
+  <body>
+    <input type="file" name="sample" accept="image/png,image/jpeg,image/gif,video/mp4" id="image" onchange="upload()">
+  </body>
+</html>
